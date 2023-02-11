@@ -1,3 +1,6 @@
+<?php
+    session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,9 +91,7 @@
     }
 }
 
-    
-    session_start();
-    //Hace el registro con el usuario de la clase 'Usuario.php'
+
     if(isset($_POST["usuario"]) && $_POST["usuario"]!= null){
         $_SESSION['usuario'] = $_POST["usuario"];
     }
@@ -98,16 +99,27 @@
     if ($_SESSION["usuario"] === null || $_SESSION["usuario"] === "") {
         session_destroy();
     }
-    //Se almacenan en el array 'peliculas'
+
+    
+
     $obj = new TopPeliculas();
-    if (isset($_POST['concatenado'])) {
-        $obj->string_Array($_POST['concatenado']."/".$_POST['ISAN'].",".$_POST['nombre'].",".$_POST['combo'].",".$_POST['anio']."/");
+    if (isset($_POST['enviar'])) {
+        $obj->string_Array($_POST['nombre'].",".$_POST['ISAN'].",".$_POST['anio'].",".$_POST['combo']."/");
     }
-    ?>
+
+    $usuario;
+    if(isset($_POST["usuario"])){
+        $usuario= ($_POST["usuario"]);
+    }
+    else{
+        $_POST["usuario"]="";
+    }
 
 
-<h1>Usuario:
-<?php { 
+ ?>
+
+<h1>Usuario: 
+    <?php { 
         if ($_SESSION["usuario"] === null || $_SESSION["usuario"] === "") {
             echo "Tienes que registrarte";
             die();
@@ -120,12 +132,12 @@
 
 <form action="TopPeliculas.php" method="post">
         <p>Nombre de la pelicula: </p>
-        <input type="text" id="nombre" name="nombre">
+        <input type="text" id="nombre" name="nombre"  value="<?php if(isset($_POST['nombre'])){echo $_POST['nombre'];}else{echo "";} ?>">
         <p>ISAN: </p>
-        <input type="text" id="ISAN" name="ISAN">
+        <input type="text" id="ISAN" name="ISAN" value="<?php if(isset($_POST['ISAN'])){echo $_POST['ISAN'];}else{echo "";} ?>">
         <br>
         <p>Anio:</p>
-        <input type="number" id="anio" name="anio">
+        <input type="number" id="anio" name="anio" value="<?php if(isset($_POST['anio'])){echo $_POST['anio'];}else{echo "";} ?>">
         <br><br>
         <p>Puntuacion:</p>
         <select name="combo">
@@ -136,17 +148,23 @@
             <option value="5">5</option>
         </select>
         <br><br><br>
-        <button type="submit">Añadir</button><br><br>
+        <button type="submit" name='enviar'>Añadir</button><br><br>
         <a href="CerrarSesion.php">Cerrar Sesion</a><br><br>
-
+        <pre><?php echo "<input type='hidden' name='usuario' value='".$_POST["usuario"]."' >" ?></pre>
+        
+        <pre>
         <?php
-            if(isset($_POST["ISAN"]) && isset($_POST["nombre"]) && isset($_POST["anio"]) && isset($_POST["combo"])){
-                $pelicula=new Pelicula(htmlentities($_POST['ISAN']),htmlentities($_POST['nombre']),htmlentities($_POST['combo']),htmlentities($_POST['anio']));
-                $obj->anadirPelicula($pelicula);
-                echo $obj->mostrarDatos();
+
+            if(isset($_POST['enviar'])){ 
+                    $_SESSION['concatenado'] = $_SESSION['concatenado'].$obj->array_String() ;
+                    print_r($_SESSION['concatenado']);
+            }else{
+                    echo $_SESSION['concatenado']='';
             }
-            echo "<input type='hidden' name='concatenado' value='".$obj->array_String()."' >"
+            
+
         ?>
+        </pre>
 
     </form>
 </body>
